@@ -222,23 +222,38 @@
         .item-content {
             display: flex;
             justify-content: space-between;
-            flex-grow: 1;
-            margin-right: 10px;
+            align-items: center;
+            width: 100%;
         }
         
-        .btn-eliminar {
+        .item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-monto {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .eliminar-btn {
             background: #ff0044;
             border: none;
             color: white;
-            padding: 5px 10px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
             cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
             transition: all 0.3s;
         }
         
-        .btn-eliminar:hover {
-            background: #ff0066;
+        .eliminar-btn:hover {
+            background: #ff3366;
             box-shadow: 0 0 10px #ff0044;
         }
         
@@ -388,30 +403,44 @@ function mostrarTransaccion(tipo, descripcion, monto) {
     const itemContent = document.createElement("div");
     itemContent.className = "item-content";
     
+    const itemInfo = document.createElement("div");
+    itemInfo.className = "item-info";
+    
     const descSpan = document.createElement("span");
     descSpan.textContent = descripcion;
     
-    const valorSpan = document.createElement("span");
-    valorSpan.className = tipo === "ingreso" ? "positivo" : "negativo";
+    const montoContainer = document.createElement("div");
+    montoContainer.className = "item-monto";
     
-    const porcentaje = tipo === "ingreso" ? 
-        (totalIngresos > 0 ? (monto / totalIngresos * 100).toFixed(1) : 100) :
-        (totalEgresos > 0 ? (monto / totalEgresos * 100).toFixed(1) : 100);
+    const montoSpan = document.createElement("span");
+    montoSpan.className = tipo === "ingreso" ? "positivo" : "negativo";
     
-    valorSpan.innerHTML = `${tipo === "ingreso" ? '+' : '-'}${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+    const porcentaje = tipo === "ingreso" 
+        ? (totalIngresos > 0 ? (monto / totalIngresos * 100).toFixed(1) : 100)
+        : (totalEgresos > 0 ? (monto / totalEgresos * 100).toFixed(1) : 100);
     
-    itemContent.appendChild(descSpan);
-    itemContent.appendChild(valorSpan);
+    const porcentajeSpan = document.createElement("span");
+    porcentajeSpan.className = "porcentaje";
+    porcentajeSpan.textContent = `${porcentaje}%`;
     
-    const btnEliminar = document.createElement("button");
-    btnEliminar.className = "btn-eliminar";
-    btnEliminar.textContent = "X";
-    btnEliminar.onclick = function() {
-        eliminarTransaccion(tipo, li, descripcion, monto);
+    montoSpan.textContent = `${tipo === "ingreso" ? '+' : '-'}${monto.toFixed(2)}`;
+    
+    const eliminarBtn = document.createElement("button");
+    eliminarBtn.className = "eliminar-btn";
+    eliminarBtn.innerHTML = "×";
+    eliminarBtn.onclick = function() {
+        eliminarTransaccion(tipo, descripcion, monto, li);
     };
     
+    montoContainer.appendChild(montoSpan);
+    montoContainer.appendChild(porcentajeSpan);
+    montoContainer.appendChild(eliminarBtn);
+    
+    itemInfo.appendChild(descSpan);
+    itemContent.appendChild(itemInfo);
+    itemContent.appendChild(montoContainer);
+    
     li.appendChild(itemContent);
-    li.appendChild(btnEliminar);
     
     if (tipo === "ingreso") {
         document.getElementById("listaIngresos").appendChild(li);
@@ -420,20 +449,14 @@ function mostrarTransaccion(tipo, descripcion, monto) {
     }
 }
 
-function eliminarTransaccion(tipo, elemento, descripcion, monto) {
+function eliminarTransaccion(tipo, descripcion, monto, elemento) {
     if (tipo === "ingreso") {
-        const index = ingresos.findIndex(item => item.desc === descripcion && item.monto === monto);
-        if (index !== -1) {
-            ingresos.splice(index, 1);
-        }
-        elemento.remove();
+        ingresos = ingresos.filter(item => item.desc !== descripcion || item.monto !== monto);
     } else {
-        const index = egresos.findIndex(item => item.desc === descripcion && item.monto === monto);
-        if (index !== -1) {
-            egresos.splice(index, 1);
-        }
-        elemento.remove();
+        egresos = egresos.filter(item => item.desc !== descripcion || item.monto !== monto);
     }
+    
+    elemento.remove();
     actualizarTotales();
 }
 
@@ -458,15 +481,15 @@ function actualizarPorcentajesListas() {
     const itemsIngresos = document.querySelectorAll("#listaIngresos .item");
     itemsIngresos.forEach((item, index) => {
         const porcentaje = totalIngresos > 0 ? (ingresos[index].monto / totalIngresos * 100).toFixed(1) : 0;
-        const spanValor = item.querySelector(".positivo");
-        spanValor.innerHTML = `+${Math.abs(ingresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+        const porcentajeSpan = item.querySelector(".porcentaje");
+        porcentajeSpan.textContent = `${porcentaje}%`;
     });
     
     const itemsEgresos = document.querySelectorAll("#listaEgresos .item");
     itemsEgresos.forEach((item, index) => {
         const porcentaje = totalEgresos > 0 ? (egresos[index].monto / totalEgresos * 100).toFixed(1) : 0;
-        const spanValor = item.querySelector(".negativo");
-        spanValor.innerHTML = `-${Math.abs(egresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+        const porcentajeSpan = item.querySelector(".porcentaje");
+        porcentajeSpan.textContent = `${porcentaje}%`;
     });
 }
 
