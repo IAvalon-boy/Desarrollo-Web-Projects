@@ -1,0 +1,84 @@
+body {
+  background-color: #0a0a0a;
+  color: #00ff9f;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 8px #00ff9f;
+}
+
+.container {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 2px solid #00ff9f;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #00ff9f;
+  background-color: #101010;
+}
+
+.titulo {
+  text-align: center;
+  color: #00ffc8;
+  text-shadow: 0 0 20px #00ffc8;
+  margin-bottom: 20px;
+}
+
+.totales, .formulario, .listas {
+  margin-top: 20px;
+}
+
+.totales p, .formulario h2, .listas h2 {
+  text-align: center;
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1a1a1a;
+  color: #00ffc8;
+  box-shadow: 0 0 10px #00ffc8;
+}
+
+button {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #00ffc8;
+  color: #000;
+  text-shadow: none;
+}
+
+.lista {
+  border: 1px solid #00ffc8;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: #111;
+  border-left: 4px solid #00ffc8;
+}
+
+.positivo {
+  color: #00ff9f;
+}
+
+.negativo {
+  color: #ff0055;
+}
+
+#mesActual {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #00ffcc;
+}
