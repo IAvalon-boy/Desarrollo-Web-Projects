@@ -1,199 +1,112 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación de Presupuesto</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Presupuesto Cyberpunk</title>
+    <link rel="stylesheet" href="Cyberpunkstyle.css">
 </head>
-<body class="bg-light">
+<body>
+    <div class="container">
+        <h1 class="titulo">💸 Presupuesto Cyberpunk 💸</h1>
+        <h3 id="mesActual"></h3>
 
-    <div class="container mt-5 p-4 shadow-lg rounded bg-white">
-        
-        <div class="text-center mb-4">
-            <h3>Presupuesto de <span id="mesActual"></span></h3>
-            <h2 class="font-weight-bold" id="totalPresupuesto">+ 0.00</h2>
+        <div class="totales">
+            <p><span>Ingresos:</span> <span id="totalIngresos">+0.00</span></p>
+            <p><span>Egresos:</span> <span id="totalEgresos">-0.00</span></p>
+            <p><span>Disponible:</span> <span id="totalPresupuesto">+0.00</span></p>
+            <p><span>Porcentaje de gastos:</span> <span id="porcentajeGastos">0%</span></p>
         </div>
 
-        
-        <div class="d-flex justify-content-center mb-4">
-            <div class="text-center mx-3">
-                <div class="badge badge-success p-3">
-                    INGRESOS: <span id="totalIngresos">+ 0.00</span>
-                </div>
-            </div>
-            <div class="text-center mx-3">
-                <div class="badge badge-danger p-3">
-                    EGRESOS: <span id="totalEgresos">- 0.00</span>
-                </div>
-                <div class="small mt-1">
-                    Porcentaje de gastos: <span id="porcentajeGastos">0%</span>
-                </div>
-            </div>
+        <div class="formulario">
+            <h2>Agregar Transacción</h2>
+            <form id="formTransaccion">
+                <select id="tipo">
+                    <option value="ingreso">Ingreso</option>
+                    <option value="egreso">Egreso</option>
+                </select>
+                <input type="text" id="descripcion" placeholder="Descripción">
+                <input type="number" id="monto" placeholder="Monto">
+                <button type="submit">Agregar</button>
+            </form>
         </div>
 
-        <hr>
-
-       
-        <div class="row">
-            <div class="col-md-4 border-right">
-                <h5 class="mb-3">Agregar Transacción</h5>
-                <form id="formTransaccion">
-                    <div class="form-group">
-                        <label for="tipo">Tipo</label>
-                        <select id="tipo" class="form-control">
-                            <option value="ingreso">Ingreso</option>
-                            <option value="egreso">Egreso</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="descripcion">Descripción</label>
-                        <input type="text" id="descripcion" class="form-control" placeholder="Ej: Sueldo, Supermercado">
-                    </div>
-                    <div class="form-group">
-                        <label for="monto">Monto</label>
-                        <input type="number" id="monto" class="form-control" placeholder="0.00">
-                    </div>
-                    <button type="submit" class="btn btn-dark btn-block">Agregar</button>
-                </form>
+        <div class="listas">
+            <div class="lista" id="listaIngresosContainer">
+                <h2>Ingresos</h2>
+                <ul id="listaIngresos"></ul>
             </div>
-
-           
-            <div class="col-md-8">
-                <ul class="nav nav-tabs" id="tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="tab-ingresos" data-toggle="tab" href="#ingresos">Ingresos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="tab-egresos" data-toggle="tab" href="#egresos">Egresos</a>
-                    </li>
-                </ul>
-
-                <div class="tab-content mt-3">
-                    
-                    <div class="tab-pane fade show active" id="ingresos">
-                        <ul class="list-group" id="listaIngresos"></ul>
-                    </div>
-
-                 
-                    <div class="tab-pane fade" id="egresos">
-                        <ul class="list-group" id="listaEgresos"></ul>
-                    </div>
-                </div>
+            <div class="lista" id="listaEgresosContainer">
+                <h2>Egresos</h2>
+                <ul id="listaEgresos"></ul>
             </div>
         </div>
     </div>
 
-    
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let ingresos = [];
+let egresos = [];
 
-   
-    <script>
-    
-    const mesActualSpan = document.getElementById('mesActual');
-    const totalPresupuesto = document.getElementById('totalPresupuesto');
-    const totalIngresosSpan = document.getElementById('totalIngresos');
-    const totalEgresosSpan = document.getElementById('totalEgresos');
-    const porcentajeGastosSpan = document.getElementById('porcentajeGastos');
-    const formTransaccion = document.getElementById('formTransaccion');
-    const tipoInput = document.getElementById('tipo');
-    const descripcionInput = document.getElementById('descripcion');
-    const montoInput = document.getElementById('monto');
-    const listaIngresos = document.getElementById('listaIngresos');
-    const listaEgresos = document.getElementById('listaEgresos');
+// Mostrar mes actual
+document.addEventListener("DOMContentLoaded", () => {
+    const fecha = new Date();
+    const opciones = { month: 'long', year: 'numeric' };
+    document.getElementById("mesActual").textContent = fecha.toLocaleDateString('es-ES', opciones);
+});
 
-    
-    let ingresos = [];
-    let egresos = [];
-
-    
-    function mostrarMesActual() {
-        const fecha = new Date();
-        const opciones = { month: 'long', year: 'numeric' };
-        const texto = fecha.toLocaleDateString('es-ES', opciones);
-        mesActualSpan.textContent = texto.charAt(0).toUpperCase() + texto.slice(1);
+// Agregar transacción
+function agregarTransaccion(tipo, descripcion, monto) {
+    monto = Number(monto);
+    if (descripcion.trim() === "" || isNaN(monto) || monto <= 0) {
+        alert("Por favor ingrese una descripción y un monto válido.");
+        return;
     }
 
-    
-    function calcularTotales() {
-        const totalIngresos = ingresos.reduce((acc, item) => acc + item.monto, 0);
-        const totalEgresos = egresos.reduce((acc, item) => acc + item.monto, 0);
-        const presupuesto = totalIngresos - totalEgresos;
-
-        const porcentajeGastos = totalIngresos > 0
-            ? ((totalEgresos * 100) / totalIngresos).toFixed(2)
-            : 0;
-
-        totalIngresosSpan.textContent = `+ ${totalIngresos.toFixed(2)}`;
-        totalEgresosSpan.textContent = `- ${totalEgresos.toFixed(2)}`;
-        totalPresupuesto.textContent = `${presupuesto >= 0 ? '+' : '-'} ${Math.abs(presupuesto).toFixed(2)}`;
-        porcentajeGastosSpan.textContent = `${porcentajeGastos}%`;
-
-        mostrarListas(totalIngresos);
+    if (tipo === "ingreso") {
+        ingresos.push({ desc: descripcion, monto });
+        mostrarTransaccion("ingreso", descripcion, monto);
+    } else {
+        egresos.push({ desc: descripcion, monto });
+        mostrarTransaccion("egreso", descripcion, monto);
     }
+    actualizarTotales();
+}
 
-    function mostrarListas(totalIngresos) {
-        listaIngresos.innerHTML = '';
-        listaEgresos.innerHTML = '';
-
-        ingresos.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center';
-            li.innerHTML = `<span>${item.descripcion}</span><span class="text-success">+ ${item.monto.toFixed(2)}</span>`;
-            listaIngresos.appendChild(li);
-        });
-
-        egresos.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center';
-            const porcentaje = totalIngresos > 0
-                ? ((item.monto * 100) / totalIngresos).toFixed(2)
-                : 0;
-            li.innerHTML = `
-                <span>${item.descripcion}</span>
-                <div>
-                    <span class="text-danger">- ${item.monto.toFixed(2)}</span>
-                    <span class="badge badge-secondary ml-2">${porcentaje}%</span>
-                </div>`;
-            listaEgresos.appendChild(li);
-        });
+// Mostrar transacción
+function mostrarTransaccion(tipo, descripcion, monto) {
+    const li = document.createElement("li");
+    li.classList.add("item");
+    if (tipo === "ingreso") {
+        li.innerHTML = `<span>${descripcion}</span><span class='positivo'>+${monto.toFixed(2)}</span>`;
+        document.getElementById("listaIngresos").appendChild(li);
+    } else {
+        li.innerHTML = `<span>${descripcion}</span><span class='negativo'>-${monto.toFixed(2)}</span>`;
+        document.getElementById("listaEgresos").appendChild(li);
     }
+}
 
-    // ============================
-   
-    // ============================
-    formTransaccion.addEventListener('submit', e => {
-        e.preventDefault();
+// Calcular totales
+function actualizarTotales() {
+    const totalIngresos = ingresos.reduce((a, b) => a + b.monto, 0);
+    const totalEgresos = egresos.reduce((a, b) => a + b.monto, 0);
+    const disponible = totalIngresos - totalEgresos;
+    const porcentaje = totalIngresos > 0 ? (totalEgresos / totalIngresos * 100).toFixed(2) : 0;
 
-        const tipo = tipoInput.value;
-        const descripcion = descripcionInput.value.trim();
-        const monto = parseFloat(montoInput.value);
+    document.getElementById("totalIngresos").textContent = `+${totalIngresos.toFixed(2)}`;
+    document.getElementById("totalEgresos").textContent = `-${totalEgresos.toFixed(2)}`;
+    document.getElementById("totalPresupuesto").textContent = `${disponible >= 0 ? '+' : '-'} ${Math.abs(disponible).toFixed(2)}`;
+    document.getElementById("porcentajeGastos").textContent = `${porcentaje}%`;
+}
 
-        if (descripcion === '' || isNaN(monto) || monto <= 0) {
-            alert('Por favor ingrese una descripción y un monto válido.');
-            return;
-        }
-
-        const nuevaTransaccion = { descripcion, monto };
-
-        if (tipo === 'ingreso') {
-            ingresos.push(nuevaTransaccion);
-        } else if (tipo === 'egreso') {
-            egresos.push(nuevaTransaccion);
-        }
-
-        formTransaccion.reset();
-        calcularTotales();
-    });
-
-    // ============================
-  
-    // ============================
-    mostrarMesActual();
-    calcularTotales();
-    </script>
+// Evento del formulario
+document.getElementById("formTransaccion").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const tipo = document.getElementById("tipo").value;
+    const descripcion = document.getElementById("descripcion").value;
+    const monto = document.getElementById("monto").value;
+    agregarTransaccion(tipo, descripcion, monto);
+    e.target.reset();
+});
+</script>
 </body>
 </html>
-
