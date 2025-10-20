@@ -204,6 +204,7 @@
         .lista .item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 10px;
             margin-bottom: 10px;
             background: rgba(0, 0, 0, 0.5);
@@ -216,6 +217,29 @@
         
         #listaEgresos .item {
             border-left-color: #ff0044;
+        }
+        
+        .item-content {
+            display: flex;
+            justify-content: space-between;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        
+        .btn-eliminar {
+            background: #ff0044;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-eliminar:hover {
+            background: #ff0066;
+            box-shadow: 0 0 10px #ff0044;
         }
         
         .porcentaje {
@@ -361,15 +385,56 @@ function mostrarTransaccion(tipo, descripcion, monto) {
     const totalIngresos = ingresos.reduce((a, b) => a + b.monto, 0);
     const totalEgresos = egresos.reduce((a, b) => a + b.monto, 0);
     
+    const itemContent = document.createElement("div");
+    itemContent.className = "item-content";
+    
+    const descSpan = document.createElement("span");
+    descSpan.textContent = descripcion;
+    
+    const valorSpan = document.createElement("span");
+    valorSpan.className = tipo === "ingreso" ? "positivo" : "negativo";
+    
+    const porcentaje = tipo === "ingreso" ? 
+        (totalIngresos > 0 ? (monto / totalIngresos * 100).toFixed(1) : 100) :
+        (totalEgresos > 0 ? (monto / totalEgresos * 100).toFixed(1) : 100);
+    
+    valorSpan.innerHTML = `${tipo === "ingreso" ? '+' : '-'}${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+    
+    itemContent.appendChild(descSpan);
+    itemContent.appendChild(valorSpan);
+    
+    const btnEliminar = document.createElement("button");
+    btnEliminar.className = "btn-eliminar";
+    btnEliminar.textContent = "X";
+    btnEliminar.onclick = function() {
+        eliminarTransaccion(tipo, li, descripcion, monto);
+    };
+    
+    li.appendChild(itemContent);
+    li.appendChild(btnEliminar);
+    
     if (tipo === "ingreso") {
-        const porcentaje = totalIngresos > 0 ? (monto / totalIngresos * 100).toFixed(1) : 100;
-        li.innerHTML = `<span>${descripcion}</span><span class='positivo'>+${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span></span>`;
         document.getElementById("listaIngresos").appendChild(li);
     } else {
-        const porcentaje = totalEgresos > 0 ? (monto / totalEgresos * 100).toFixed(1) : 100;
-        li.innerHTML = `<span>${descripcion}</span><span class='negativo'>-${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span></span>`;
         document.getElementById("listaEgresos").appendChild(li);
     }
+}
+
+function eliminarTransaccion(tipo, elemento, descripcion, monto) {
+    if (tipo === "ingreso") {
+        const index = ingresos.findIndex(item => item.desc === descripcion && item.monto === monto);
+        if (index !== -1) {
+            ingresos.splice(index, 1);
+        }
+        elemento.remove();
+    } else {
+        const index = egresos.findIndex(item => item.desc === descripcion && item.monto === monto);
+        if (index !== -1) {
+            egresos.splice(index, 1);
+        }
+        elemento.remove();
+    }
+    actualizarTotales();
 }
 
 function actualizarTotales() {
@@ -393,15 +458,15 @@ function actualizarPorcentajesListas() {
     const itemsIngresos = document.querySelectorAll("#listaIngresos .item");
     itemsIngresos.forEach((item, index) => {
         const porcentaje = totalIngresos > 0 ? (ingresos[index].monto / totalIngresos * 100).toFixed(1) : 0;
-        const spanValor = item.querySelector(".positivo, .negativo");
-        spanValor.innerHTML = `${ingresos[index].monto >= 0 ? '+' : '-'}${Math.abs(ingresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+        const spanValor = item.querySelector(".positivo");
+        spanValor.innerHTML = `+${Math.abs(ingresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
     });
     
     const itemsEgresos = document.querySelectorAll("#listaEgresos .item");
     itemsEgresos.forEach((item, index) => {
         const porcentaje = totalEgresos > 0 ? (egresos[index].monto / totalEgresos * 100).toFixed(1) : 0;
-        const spanValor = item.querySelector(".positivo, .negativo");
-        spanValor.innerHTML = `${egresos[index].monto >= 0 ? '+' : '-'}${Math.abs(egresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+        const spanValor = item.querySelector(".negativo");
+        spanValor.innerHTML = `-${Math.abs(egresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
     });
 }
 
