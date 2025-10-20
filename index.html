@@ -5,39 +5,323 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presupuesto Cyberpunk</title>
     <link rel="stylesheet" href="Cyberpunkstyle.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00f3ff;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 221, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 48%, rgba(0, 243, 255, 0.05) 50%, transparent 52%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .titulo {
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .titulo::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00f3ff, transparent);
+            box-shadow: 0 0 10px #00f3ff;
+        }
+        
+        #mesActual {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #ff00dd;
+            text-shadow: 0 0 5px #ff00dd;
+        }
+        
+        .totales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .total-item {
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #00f3ff;
+            border-radius: 0;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .total-item::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 243, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            z-index: 0;
+        }
+        
+        .total-item h3 {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #ff00dd;
+            text-shadow: 0 0 5px #ff00dd;
+        }
+        
+        .total-item .valor {
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .positivo {
+            color: #00ff88;
+            text-shadow: 0 0 5px #00ff88;
+        }
+        
+        .negativo {
+            color: #ff0044;
+            text-shadow: 0 0 5px #ff0044;
+        }
+        
+        .formulario {
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #ff00dd;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 15px rgba(255, 0, 221, 0.3);
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+        }
+        
+        .formulario h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #ff00dd;
+            text-shadow: 0 0 5px #ff00dd;
+        }
+        
+        #formTransaccion {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr auto;
+            gap: 10px;
+        }
+        
+        #formTransaccion select, 
+        #formTransaccion input {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #formTransaccion button {
+            background: linear-gradient(45deg, #ff00dd, #00f3ff);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        
+        #formTransaccion button:hover {
+            box-shadow: 0 0 15px #ff00dd;
+        }
+        
+        .listas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .lista {
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #00f3ff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+        
+        #listaIngresosContainer {
+            border-radius: 50% 0 0 0;
+        }
+        
+        #listaEgresosContainer {
+            border-radius: 0 0 50% 0;
+        }
+        
+        .lista h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #ff00dd;
+            text-shadow: 0 0 5px #ff00dd;
+            border-bottom: 1px solid #00f3ff;
+            padding-bottom: 10px;
+        }
+        
+        .lista ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .lista .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid #00f3ff;
+        }
+        
+        #listaIngresos .item {
+            border-left-color: #00ff88;
+        }
+        
+        #listaEgresos .item {
+            border-left-color: #ff0044;
+        }
+        
+        .porcentaje {
+            font-size: 0.8rem;
+            color: #888;
+            margin-left: 5px;
+        }
+        
+        .decoracion {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .triangulo {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173px solid #ff00dd;
+            top: 10%;
+            right: 5%;
+            transform: rotate(45deg);
+        }
+        
+        .cuadrado {
+            width: 150px;
+            height: 150px;
+            border: 5px solid #00f3ff;
+            bottom: 10%;
+            left: 5%;
+            transform: rotate(15deg);
+        }
+        
+        .circulo {
+            width: 120px;
+            height: 120px;
+            border: 5px solid #ff00dd;
+            border-radius: 50%;
+            bottom: 20%;
+            right: 10%;
+        }
+        
+        @media (max-width: 768px) {
+            #formTransaccion {
+                grid-template-columns: 1fr;
+            }
+            
+            .listas-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .decoracion {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="decoracion triangulo"></div>
+    <div class="decoracion cuadrado"></div>
+    <div class="decoracion circulo"></div>
+    
     <div class="container">
-        <h1 class="titulo">💸 Presupuesto Cyberpunk 💸</h1>
+        <h1 class="titulo">💸 PRESUPUESTO CYBERPUNK 💸</h1>
         <h3 id="mesActual"></h3>
 
-        <div class="totales">
-            <p><span>Ingresos:</span> <span id="totalIngresos">+0.00</span></p>
-            <p><span>Egresos:</span> <span id="totalEgresos">-0.00</span></p>
-            <p><span>Disponible:</span> <span id="totalPresupuesto">+0.00</span></p>
-            <p><span>Porcentaje de gastos:</span> <span id="porcentajeGastos">0%</span></p>
+        <div class="totales-grid">
+            <div class="total-item">
+                <h3>INGRESOS</h3>
+                <div class="valor positivo" id="totalIngresos">+0.00</div>
+            </div>
+            <div class="total-item">
+                <h3>EGRESOS</h3>
+                <div class="valor negativo" id="totalEgresos">-0.00</div>
+            </div>
+            <div class="total-item">
+                <h3>DISPONIBLE</h3>
+                <div class="valor positivo" id="totalPresupuesto">+0.00</div>
+            </div>
+            <div class="total-item">
+                <h3>PORCENTAJE DE GASTOS</h3>
+                <div class="valor" id="porcentajeGastos">0%</div>
+            </div>
         </div>
 
         <div class="formulario">
-            <h2>Agregar Transacción</h2>
+            <h2>AGREGAR TRANSACCIÓN</h2>
             <form id="formTransaccion">
                 <select id="tipo">
-                    <option value="ingreso">Ingreso</option>
-                    <option value="egreso">Egreso</option>
+                    <option value="ingreso">INGRESO</option>
+                    <option value="egreso">EGRESO</option>
                 </select>
-                <input type="text" id="descripcion" placeholder="Descripción">
-                <input type="number" id="monto" placeholder="Monto">
-                <button type="submit">Agregar</button>
+                <input type="text" id="descripcion" placeholder="DESCRIPCIÓN">
+                <input type="number" id="monto" placeholder="MONTO">
+                <button type="submit">AGREGAR</button>
             </form>
         </div>
 
-        <div class="listas">
+        <div class="listas-grid">
             <div class="lista" id="listaIngresosContainer">
-                <h2>Ingresos</h2>
+                <h2>INGRESOS</h2>
                 <ul id="listaIngresos"></ul>
             </div>
             <div class="lista" id="listaEgresosContainer">
-                <h2>Egresos</h2>
+                <h2>EGRESOS</h2>
                 <ul id="listaEgresos"></ul>
             </div>
         </div>
@@ -47,14 +331,12 @@
 let ingresos = [];
 let egresos = [];
 
-// Mostrar mes actual
 document.addEventListener("DOMContentLoaded", () => {
     const fecha = new Date();
     const opciones = { month: 'long', year: 'numeric' };
-    document.getElementById("mesActual").textContent = fecha.toLocaleDateString('es-ES', opciones);
+    document.getElementById("mesActual").textContent = fecha.toLocaleDateString('es-ES', opciones).toUpperCase();
 });
 
-// Agregar transacción
 function agregarTransaccion(tipo, descripcion, monto) {
     monto = Number(monto);
     if (descripcion.trim() === "" || isNaN(monto) || monto <= 0) {
@@ -72,20 +354,24 @@ function agregarTransaccion(tipo, descripcion, monto) {
     actualizarTotales();
 }
 
-// Mostrar transacción
 function mostrarTransaccion(tipo, descripcion, monto) {
     const li = document.createElement("li");
     li.classList.add("item");
+    
+    const totalIngresos = ingresos.reduce((a, b) => a + b.monto, 0);
+    const totalEgresos = egresos.reduce((a, b) => a + b.monto, 0);
+    
     if (tipo === "ingreso") {
-        li.innerHTML = `<span>${descripcion}</span><span class='positivo'>+${monto.toFixed(2)}</span>`;
+        const porcentaje = totalIngresos > 0 ? (monto / totalIngresos * 100).toFixed(1) : 100;
+        li.innerHTML = `<span>${descripcion}</span><span class='positivo'>+${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span></span>`;
         document.getElementById("listaIngresos").appendChild(li);
     } else {
-        li.innerHTML = `<span>${descripcion}</span><span class='negativo'>-${monto.toFixed(2)}</span>`;
+        const porcentaje = totalEgresos > 0 ? (monto / totalEgresos * 100).toFixed(1) : 100;
+        li.innerHTML = `<span>${descripcion}</span><span class='negativo'>-${monto.toFixed(2)} <span class="porcentaje">${porcentaje}%</span></span>`;
         document.getElementById("listaEgresos").appendChild(li);
     }
 }
 
-// Calcular totales
 function actualizarTotales() {
     const totalIngresos = ingresos.reduce((a, b) => a + b.monto, 0);
     const totalEgresos = egresos.reduce((a, b) => a + b.monto, 0);
@@ -96,9 +382,29 @@ function actualizarTotales() {
     document.getElementById("totalEgresos").textContent = `-${totalEgresos.toFixed(2)}`;
     document.getElementById("totalPresupuesto").textContent = `${disponible >= 0 ? '+' : '-'} ${Math.abs(disponible).toFixed(2)}`;
     document.getElementById("porcentajeGastos").textContent = `${porcentaje}%`;
+    
+    actualizarPorcentajesListas();
 }
 
-// Evento del formulario
+function actualizarPorcentajesListas() {
+    const totalIngresos = ingresos.reduce((a, b) => a + b.monto, 0);
+    const totalEgresos = egresos.reduce((a, b) => a + b.monto, 0);
+    
+    const itemsIngresos = document.querySelectorAll("#listaIngresos .item");
+    itemsIngresos.forEach((item, index) => {
+        const porcentaje = totalIngresos > 0 ? (ingresos[index].monto / totalIngresos * 100).toFixed(1) : 0;
+        const spanValor = item.querySelector(".positivo, .negativo");
+        spanValor.innerHTML = `${ingresos[index].monto >= 0 ? '+' : '-'}${Math.abs(ingresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+    });
+    
+    const itemsEgresos = document.querySelectorAll("#listaEgresos .item");
+    itemsEgresos.forEach((item, index) => {
+        const porcentaje = totalEgresos > 0 ? (egresos[index].monto / totalEgresos * 100).toFixed(1) : 0;
+        const spanValor = item.querySelector(".positivo, .negativo");
+        spanValor.innerHTML = `${egresos[index].monto >= 0 ? '+' : '-'}${Math.abs(egresos[index].monto).toFixed(2)} <span class="porcentaje">${porcentaje}%</span>`;
+    });
+}
+
 document.getElementById("formTransaccion").addEventListener("submit", (e) => {
     e.preventDefault();
     const tipo = document.getElementById("tipo").value;
