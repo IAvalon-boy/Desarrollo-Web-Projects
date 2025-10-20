@@ -125,7 +125,6 @@
             padding: 20px;
             margin-bottom: 40px;
             box-shadow: 0 0 15px rgba(255, 0, 221, 0.3);
-            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
         }
         
         .formulario h2 {
@@ -159,6 +158,7 @@
             cursor: pointer;
             font-family: 'Courier New', monospace;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         #formTransaccion button:hover {
@@ -178,14 +178,6 @@
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
         
-        #listaIngresosContainer {
-            border-radius: 50% 0 0 0;
-        }
-        
-        #listaEgresosContainer {
-            border-radius: 0 0 50% 0;
-        }
-        
         .lista h2 {
             text-align: center;
             margin-top: 0;
@@ -193,6 +185,7 @@
             text-shadow: 0 0 5px #ff00dd;
             border-bottom: 1px solid #00f3ff;
             padding-bottom: 10px;
+            margin-bottom: 15px;
         }
         
         .lista ul {
@@ -229,6 +222,7 @@
         .item-info {
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
         
         .item-monto {
@@ -250,6 +244,7 @@
             justify-content: center;
             font-size: 14px;
             transition: all 0.3s;
+            flex-shrink: 0;
         }
         
         .eliminar-btn:hover {
@@ -261,6 +256,7 @@
             font-size: 0.8rem;
             color: #888;
             margin-left: 5px;
+            white-space: nowrap;
         }
         
         .decoracion {
@@ -309,6 +305,16 @@
             
             .decoracion {
                 display: none;
+            }
+            
+            .item-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .item-monto {
+                align-self: flex-end;
             }
         }
     </style>
